@@ -11,9 +11,9 @@ import '../../widgets/common/custom_button.dart';
 import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/loading_indicator.dart';
 import '../../widgets/common/app_back_button.dart';
+import '../common/login_screen.dart';
 
 class CandidateProfileScreen extends StatefulWidget {
-
   const CandidateProfileScreen({super.key});
 
   @override
@@ -115,6 +115,43 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
 
   }
 
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.logout_rounded, color: AppColors.error),
+            SizedBox(width: 8),
+            Text('Confirm Logout'),
+          ],
+        ),
+        content: const Text('Are you sure you want to log out of your session?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              await authProvider.logout();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileProvider = Provider.of<CandidateProfileProvider>(context);
@@ -124,6 +161,14 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
       appBar: AppBar(
         leading: const AppBackButton(),
         title: const Text('My Candidate Profile & Resume'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+            tooltip: 'Logout',
+            onPressed: () => _confirmLogout(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
 
       body: profileProvider.isLoading && profile == null
@@ -267,6 +312,59 @@ class _CandidateProfileScreenState extends State<CandidateProfileScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+
+                  // Logout Account Card
+                  Card(
+                    color: AppColors.error.withValues(alpha: 0.05),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: AppColors.error.withValues(alpha: 0.3)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.logout_rounded, color: AppColors.error, size: 24),
+                          ),
+                          const SizedBox(width: 16),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Sign Out Account',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.error),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'End your active session securely',
+                                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            icon: const Icon(Icons.logout_rounded, size: 18),
+                            label: const Text('Logout'),
+                            onPressed: () => _confirmLogout(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
