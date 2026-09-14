@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/responsive.dart';
+import '../../providers/auth_provider.dart';
+import '../common/login_screen.dart';
 import 'recruiter_dashboard_screen.dart';
 import 'company_profile_screen.dart';
 import 'post_job_screen.dart';
@@ -46,12 +49,59 @@ class _RecruiterMainLayoutState extends State<RecruiterMainLayout> {
     ),
   ];
 
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.logout, color: AppColors.error),
+            SizedBox(width: 8),
+            Text('Confirm Logout'),
+          ],
+        ),
+        content: const Text('Are you sure you want to log out of your session?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              await authProvider.logout();
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
 
     if (isMobile) {
       return Scaffold(
+        appBar: AppBar(
+          title: const Text('Recruiter Portal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: AppColors.error),
+              tooltip: 'Logout',
+              onPressed: _confirmLogout,
+            ),
+          ],
+        ),
         body: IndexedStack(
           index: _currentIndex,
           children: _pages,
@@ -80,7 +130,7 @@ class _RecruiterMainLayoutState extends State<RecruiterMainLayout> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.work_outline),
                 activeIcon: Icon(Icons.work),
-                label: 'Manage Jobs',
+                label: 'Jobs',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.add_circle_outline),
@@ -117,7 +167,7 @@ class _RecruiterMainLayoutState extends State<RecruiterMainLayout> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.accent,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.business_center, color: Colors.white, size: 20),
@@ -125,7 +175,7 @@ class _RecruiterMainLayoutState extends State<RecruiterMainLayout> {
                   if (!Responsive.isTablet(context)) ...[
                     const SizedBox(width: 12),
                     const Text(
-                      'Recruiter HR',
+                      'HR Portal',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -133,6 +183,19 @@ class _RecruiterMainLayoutState extends State<RecruiterMainLayout> {
                     ),
                   ],
                 ],
+              ),
+            ),
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+                    tooltip: 'Logout Session',
+                    onPressed: _confirmLogout,
+                  ),
+                ),
               ),
             ),
             destinations: _railDestinations,

@@ -21,6 +21,7 @@ class AppColors {
   static const Color statusInterview = Color(0xFF0284C7); // Sky Blue
   static const Color statusSelected = Color(0xFF059669); // Emerald Green
   static const Color statusRejected = Color(0xFFE11D48); // Crimson Red
+  static const Color error = Color(0xFFE11D48); // Red Error Alert
 
   // Text Colors
   static const Color textPrimary = Color(0xFF0F172A);
@@ -31,4 +32,3 @@ class AppColors {
   static const Color border = Color(0xFFE2E8F0);
   static const Color darkBorder = Color(0xFF334155);
 }
-

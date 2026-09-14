@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/responsive.dart';
+import '../../providers/auth_provider.dart';
+import '../common/login_screen.dart';
 import 'candidate_dashboard_screen.dart';
 import 'job_search_screen.dart';
 import 'candidate_applications_screen.dart';
@@ -53,12 +56,59 @@ class _CandidateMainLayoutState extends State<CandidateMainLayout> {
     ),
   ];
 
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.logout, color: AppColors.error),
+            SizedBox(width: 8),
+            Text('Confirm Logout'),
+          ],
+        ),
+        content: const Text('Are you sure you want to log out of your session?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              await authProvider.logout();
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
 
     if (isMobile) {
       return Scaffold(
+        appBar: AppBar(
+          title: const Text('JRMS Portal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: AppColors.error),
+              tooltip: 'Logout',
+              onPressed: _confirmLogout,
+            ),
+          ],
+        ),
         body: IndexedStack(
           index: _currentIndex,
           children: _pages,
@@ -145,6 +195,19 @@ class _CandidateMainLayoutState extends State<CandidateMainLayout> {
                     ),
                   ],
                 ],
+              ),
+            ),
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+                    tooltip: 'Logout Session',
+                    onPressed: _confirmLogout,
+                  ),
+                ),
               ),
             ),
             destinations: _railDestinations,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/responsive.dart';
+import '../../providers/auth_provider.dart';
+import '../common/login_screen.dart';
 import 'admin_dashboard_screen.dart';
 import 'manage_users_screen.dart';
 import 'manage_categories_screen.dart';
@@ -46,12 +49,59 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
     ),
   ];
 
+  void _confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.logout, color: AppColors.error),
+            SizedBox(width: 8),
+            Text('Confirm Logout'),
+          ],
+        ),
+        content: const Text('Are you sure you want to log out of your session?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              await authProvider.logout();
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = Responsive.isMobile(context);
 
     if (isMobile) {
       return Scaffold(
+        appBar: AppBar(
+          title: const Text('Admin Portal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: AppColors.error),
+              tooltip: 'Logout',
+              onPressed: _confirmLogout,
+            ),
+          ],
+        ),
         body: IndexedStack(
           index: _currentIndex,
           children: _pages,
@@ -75,12 +125,12 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.admin_panel_settings_outlined),
                 activeIcon: Icon(Icons.admin_panel_settings),
-                label: 'Command Center',
+                label: 'Control',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.people_alt_outlined),
                 activeIcon: Icon(Icons.people_alt),
-                label: 'Manage Users',
+                label: 'Users',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.category_outlined),
@@ -109,7 +159,7 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
               });
             },
             extended: !Responsive.isTablet(context),
-            minExtendedWidth: 190,
+            minExtendedWidth: 180,
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
               child: Row(
@@ -117,15 +167,15 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppColors.statusUnderReview,
+                      color: AppColors.accent,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.shield, color: Colors.white, size: 20),
+                    child: const Icon(Icons.security, color: Colors.white, size: 20),
                   ),
                   if (!Responsive.isTablet(context)) ...[
                     const SizedBox(width: 12),
                     const Text(
-                      'Admin Suite',
+                      'Admin Control',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -133,6 +183,19 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
                     ),
                   ],
                 ],
+              ),
+            ),
+            trailing: Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+                    tooltip: 'Logout Session',
+                    onPressed: _confirmLogout,
+                  ),
+                ),
               ),
             ),
             destinations: _railDestinations,
