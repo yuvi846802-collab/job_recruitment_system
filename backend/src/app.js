@@ -28,7 +28,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Serve Uploaded Files statically
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Health check endpoint
+// Root & Health check endpoints
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    system: 'Job Recruitment Management System (JRMS) REST API',
+    health: '/api/health',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
