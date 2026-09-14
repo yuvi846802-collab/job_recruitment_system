@@ -138,8 +138,17 @@ function convertToPgSql(sql) {
 }
 
 // Unified query abstraction layer
+let initPromise = null;
+
 async function query(sql, params = []) {
   try {
+    if (!isConnected && !pgPool && !mysqlPool) {
+      if (!initPromise) {
+        initPromise = initDB();
+      }
+      await initPromise;
+    }
+
     if (dbType === 'pg' && pgPool) {
       const formattedSql = convertToPgSql(sql);
       const result = await pgPool.query(formattedSql, params);
