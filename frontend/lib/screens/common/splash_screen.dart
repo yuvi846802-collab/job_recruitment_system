@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthentication() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 1000));
     if (!mounted) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -31,12 +31,12 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (authProvider.isAuthenticated) {
-      final role = authProvider.userRole;
+      final role = authProvider.userRole.toLowerCase();
       if (role == 'admin') {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const AdminMainLayout()),
         );
-      } else if (role == 'recruiter') {
+      } else if (role == 'recruiter' || role == 'hr') {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const RecruiterMainLayout()),
         );

@@ -13,7 +13,10 @@ INSERT INTO users (id, email, password_hash, role, full_name, phone, is_active) 
 (4, 'talent@designify.co', '$2a$10$5M8pYlG1fU8YgG1N5bX3u.8R9mN0p1q2r3s4t5u6v7w8x9y0z1a2b', 'recruiter', 'Elena Rostova', '+1 (555) 018-7712', TRUE),
 (5, 'candidate.alex@gmail.com', '$2a$10$5M8pYlG1fU8YgG1N5bX3u.8R9mN0p1q2r3s4t5u6v7w8x9y0z1a2b', 'candidate', 'Alex Rivera', '+1 (555) 012-3456', TRUE),
 (6, 'candidate.priya@yahoo.com', '$2a$10$5M8pYlG1fU8YgG1N5bX3u.8R9mN0p1q2r3s4t5u6v7w8x9y0z1a2b', 'candidate', 'Priya Sharma', '+1 (555) 013-8822', TRUE),
-(7, 'candidate.marcus@outlook.com', '$2a$10$5M8pYlG1fU8YgG1N5bX3u.8R9mN0p1q2r3s4t5u6v7w8x9y0z1a2b', 'candidate', 'Marcus Vance', '+1 (555) 015-6677', TRUE);
+(7, 'candidate.marcus@outlook.com', '$2a$10$5M8pYlG1fU8YgG1N5bX3u.8R9mN0p1q2r3s4t5u6v7w8x9y0z1a2b', 'candidate', 'Marcus Vance', '+1 (555) 015-6677', TRUE),
+(8, 'admin@jrms.local', '$2a$10$9LyxTYPk3LUhzjsgpinSYe3kCjeY2NifAg7cw.BcEBlHvTXn6LYq.', 'admin', 'Demo Admin', '+91 98765 43210', TRUE),
+(9, 'hr@jrms.local', '$2a$10$.lYxkO0BhgQfqkgIbB9JpencgA7F/rLPjRZeqP9.vN78E9LvLRyze', 'recruiter', 'Demo HR Manager', '+91 98765 43211', TRUE),
+(10, 'user@jrms.local', '$2a$10$ttODAff1LAjdcB/yotPhRuLja5gLqVySsqHOZPEaAxnDQ/oHh3Iea', 'candidate', 'Demo User', '+91 98765 43212', TRUE);
 
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 
@@ -21,7 +24,8 @@ SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 INSERT INTO companies (id, recruiter_id, company_name, logo_url, description, industry, company_size, website, location) VALUES
 (1, 2, 'InnovateTech Solutions', 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=300', 'Leading AI and full-stack software development firm specializing in cloud enterprise systems.', 'Software & Technology', '250-500', 'https://innovatetech.example.com', 'San Francisco, CA'),
 (2, 3, 'CloudScale Systems', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=300', 'Next-generation cloud infrastructure, Kubernetes, and DevOps consulting company.', 'Cloud Computing', '100-250', 'https://cloudscale.example.io', 'Austin, TX'),
-(3, 4, 'Designify Studio', 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=300', 'Award-winning UI/UX digital design agency crafting human-centered mobile and web experiences.', 'Design & Media', '50-100', 'https://designify.example.co', 'New York, NY');
+(3, 4, 'Designify Studio', 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=300', 'Award-winning UI/UX digital design agency crafting human-centered mobile and web experiences.', 'Design & Media', '50-100', 'https://designify.example.co', 'New York, NY'),
+(4, 9, 'JRMS Technologies Pvt. Ltd.', 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=300', 'Enterprise recruitment systems software engineering and cloud infrastructure development firm.', 'Information Technology', '100-500', 'https://jrms.example.local', 'India');
 
 SELECT setval('companies_id_seq', (SELECT MAX(id) FROM companies));
 
@@ -29,7 +33,8 @@ SELECT setval('companies_id_seq', (SELECT MAX(id) FROM companies));
 INSERT INTO job_seekers (id, user_id, location, bio, profile_photo, resume_url, resume_filename) VALUES
 (1, 5, 'Seattle, WA', 'Passionate Senior Mobile & Flutter Engineer with 4+ years of experience building cross-platform apps.', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300', '/uploads/resumes/alex_rivera_resume.pdf', 'alex_rivera_resume.pdf'),
 (2, 6, 'San Jose, CA', 'Full Stack Developer proficient in React, Node.js, Express, and MySQL/PostgreSQL databases.', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300', '/uploads/resumes/priya_sharma_resume.pdf', 'priya_sharma_resume.pdf'),
-(3, 7, 'Chicago, IL', 'Product Designer & UI/UX Specialist with expertise in Figma, Design Systems, and Design Tokens.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300', '/uploads/resumes/marcus_vance_resume.pdf', 'marcus_vance_resume.pdf');
+(3, 7, 'Chicago, IL', 'Product Designer & UI/UX Specialist with expertise in Figma, Design Systems, and Design Tokens.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300', '/uploads/resumes/marcus_vance_resume.pdf', 'marcus_vance_resume.pdf'),
+(4, 10, 'India', 'Fullstack Software Engineer & Demo Candidate for JRMS recruitment system testing.', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300', '/uploads/resumes/demo_user_resume.pdf', 'demo_user_resume.pdf');
 
 SELECT setval('job_seekers_id_seq', (SELECT MAX(id) FROM job_seekers));
 

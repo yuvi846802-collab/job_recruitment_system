@@ -28,7 +28,7 @@ DROP TYPE IF EXISTS interview_mode_enum CASCADE;
 DROP TYPE IF EXISTS interview_status_enum CASCADE;
 
 -- Enums
-CREATE TYPE user_role_enum AS ENUM ('admin', 'recruiter', 'candidate');
+CREATE TYPE user_role_enum AS ENUM ('admin', 'recruiter', 'candidate', 'hr', 'user');
 CREATE TYPE job_type_enum AS ENUM ('Full Time', 'Part Time', 'Internship', 'Contract');
 CREATE TYPE work_mode_enum AS ENUM ('On-site', 'Remote', 'Hybrid');
 CREATE TYPE job_status_enum AS ENUM ('active', 'closed', 'draft');

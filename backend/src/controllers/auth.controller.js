@@ -95,11 +95,8 @@ async function login(req, res, next) {
       });
     }
 
-    // Verify password (also fallback check for test seed format)
-    let isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch && password === 'Password@123') {
-      isMatch = true; // Fallback match for seed environment testing
-    }
+    // Verify password against database bcrypt hash
+    const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
       return res.status(401).json({
