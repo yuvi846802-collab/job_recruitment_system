@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/app_snackbar.dart';
-import '../../widgets/common/custom_button.dart';
-import '../../widgets/common/custom_text_field.dart';
 import '../candidate/candidate_main_layout.dart';
 import '../recruiter/recruiter_main_layout.dart';
 import '../admin/admin_main_layout.dart';
@@ -66,323 +63,312 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 900;
-
     return Scaffold(
-      backgroundColor: isDesktop ? AppColors.darkBackground : AppColors.background,
-      body: SafeArea(
-        child: isDesktop ? _buildSplitDesktopLayout() : _buildMobileLayout(),
-      ),
-    );
-  }
-
-  /// 🖥️ Split Desktop / Laptop Layout
-  Widget _buildSplitDesktopLayout() {
-    return Row(
-      children: [
-        // Left Side: Brand & Recruitment Banner Illustration
-        Expanded(
-          flex: 5,
-          child: Container(
-            padding: const EdgeInsets.all(48.0),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primary,
-                  AppColors.primaryLight,
-                  Color(0xFF1E1B4B),
-                ],
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Brand Header
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.accent.withValues(alpha: 0.4),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.work_history_rounded, size: 36, color: Colors.white),
-                    ),
-                    const SizedBox(width: 16),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'JRMS PLATFORM',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                        Text(
-                          'Job Recruitment Management System',
-                          style: TextStyle(fontSize: 13, color: Colors.white70),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 48),
-
-                // Hero Vector Illustration Card
-                Container(
-                  padding: const EdgeInsets.all(28),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Icons.hub_rounded, size: 48, color: AppColors.secondary),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Connecting Top Talent with Industry Leaders',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Enterprise-grade recruitment portal with real-time PostgreSQL database synchronization, role-based controls, and seamless candidate-HR workflow.',
-                        style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.75), height: 1.5),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 36),
-
-                // Feature Highlights
-                _featureItem(Icons.verified_user_rounded, 'Real Supabase PostgreSQL Database Authentication'),
-                const SizedBox(height: 14),
-                _featureItem(Icons.badge_rounded, '3 Distinct Roles: Admin, HR, and User (Job Seeker)'),
-                const SizedBox(height: 14),
-                _featureItem(Icons.security_rounded, 'Bcrypt Hashed Security & Role-Based Authorization'),
-              ],
-            ),
-          ),
-        ),
-
-        // Right Side: Sign In Card
-        Expanded(
-          flex: 4,
-          child: Container(
-            color: AppColors.background,
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(40.0),
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 440),
-                  child: _buildLoginFormCard(),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 📱 Mobile & Tablet Single Column Layout
-  Widget _buildMobileLayout() {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: _buildLoginFormCard(),
-        ),
-      ),
-    );
-  }
-
-  /// 💳 Login Form Card (Shared between layouts)
-  Widget _buildLoginFormCard() {
-    final authProvider = Provider.of<AuthProvider>(context);
-
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: AppColors.border, width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Title
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.lock_open_rounded, color: AppColors.accent, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Welcome Back',
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                        ),
-                        Text(
-                          'Sign in to continue to JRMS',
-                          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Email Input Field
-              CustomTextField(
-                controller: _emailController,
-                label: 'Email Address',
-                hint: 'Enter your email address',
-                prefixIcon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'Email address is required';
-                  if (!val.contains('@')) return 'Enter a valid email address';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 18),
-
-              // Password Input Field
-              CustomTextField(
-                controller: _passwordController,
-                label: 'Password',
-                hint: 'Enter your password',
-                prefixIcon: Icons.lock_outline,
-                obscureText: _obscurePassword,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    size: 20,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'Password is required';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-
-              // Remember Me & Forgot Password Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Checkbox(
-                          value: _rememberMe,
-                          activeColor: AppColors.accent,
-                          onChanged: (val) {
-                            setState(() {
-                              _rememberMe = val ?? true;
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Remember Me',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
-                      );
-                    },
-                    child: const Text('Forgot Password?', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Sign In Action Button (Authenticates against real backend API)
-              CustomButton(
-                text: 'Sign In',
-                isLoading: authProvider.isLoading,
-                onPressed: _handleLogin,
-              ),
-              const SizedBox(height: 24),
-
-              // Registration Link Footer
-              Wrap(
-                alignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  const Text("Don't have an account? ", style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
-                  TextButton(
-                    onPressed: () => _showRegisterChoiceDialog(context),
-                    child: const Text('Register Now', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                ],
-              ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF3B52E1), // Royal Blue
+              Color(0xFF5B3CC4), // Deep Purple
+              Color(0xFF8638C6), // Electric Purple
             ],
           ),
         ),
+        child: Stack(
+          children: [
+            // Soft Background Glowing Overlay Orbs (Matching Design Picture)
+            Positioned(
+              top: -60,
+              right: -60,
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.pinkAccent.withValues(alpha: 0.25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.pinkAccent.withValues(alpha: 0.25),
+                      blurRadius: 90,
+                      spreadRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -80,
+              left: -80,
+              child: Container(
+                width: 320,
+                height: 320,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.purpleAccent.withValues(alpha: 0.25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purpleAccent.withValues(alpha: 0.25),
+                      blurRadius: 100,
+                      spreadRadius: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Main Content Area
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 36.0),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: _buildMemberLoginCard(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _featureItem(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.secondary, size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w500),
+  /// 💳 Member Login Card (Exact UI Matching Picture)
+  Widget _buildMemberLoginCard() {
+    final authProvider = Provider.of<AuthProvider>(context);
+
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // 1. Top White Circle Avatar Badge
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3.5),
+              color: Colors.white.withValues(alpha: 0.08),
+            ),
+            child: const Center(
+              child: Icon(Icons.person, size: 58, color: Colors.white),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 20),
+
+          // 2. Title Text: "Member Login"
+          const Text(
+            'Member Login',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 36),
+
+          // 3. Input 1: "Username" (Pill shape, Person Icon, Accepts Email)
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              style: const TextStyle(color: Color(0xFF2D3748), fontWeight: FontWeight.w600, fontSize: 16),
+              decoration: const InputDecoration(
+                hintText: 'Username',
+                hintStyle: TextStyle(color: Color(0xFF8898AA), fontSize: 17, fontWeight: FontWeight.w400),
+                prefixIcon: Padding(
+                  padding: EdgeInsets.only(left: 20, right: 14),
+                  child: Icon(Icons.person, color: Color(0xFF3B52E1), size: 26),
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) return 'Username (Email) is required';
+                if (!val.contains('@')) return 'Enter a valid email address';
+                return null;
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // 4. Input 2: Password Field (Pill shape, Lock Icon)
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              style: const TextStyle(color: Color(0xFF2D3748), fontWeight: FontWeight.w600, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: '••••••••••••',
+                hintStyle: const TextStyle(color: Color(0xFF8898AA), fontSize: 18, letterSpacing: 2),
+                prefixIcon: const Padding(
+                  padding: EdgeInsets.only(left: 20, right: 14),
+                  child: Icon(Icons.lock, color: Color(0xFF3B52E1), size: 26),
+                ),
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                      color: const Color(0xFF8898AA),
+                      size: 22,
+                    ),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) return 'Password is required';
+                return null;
+              },
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // 5. Options Row: "Remember me" & "Forgot Password?"
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: 4,
+            children: [
+              GestureDetector(
+                onTap: () => setState(() => _rememberMe = !_rememberMe),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _rememberMe ? Icons.check_circle : Icons.radio_button_unchecked,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Remember me',
+                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                  );
+                },
+                child: const Text(
+                  'Forgot Password?',
+                  style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 28),
+
+          // 6. Pill-shaped White Outline Login Button
+          Container(
+            width: 180,
+            height: 52,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white, width: 2),
+              color: Colors.white.withValues(alpha: 0.12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(30),
+                onTap: authProvider.isLoading ? null : _handleLogin,
+                child: Center(
+                  child: authProvider.isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 36),
+
+          // 7. Footer: "Not a member?" & White Pill Button "Create an account"
+          const Text(
+            'Not a member?',
+            style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF3B52E1),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 12),
+              elevation: 4,
+            ),
+            onPressed: () => _showRegisterChoiceDialog(context),
+            child: const Text(
+              'Create an account',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF3B52E1)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
