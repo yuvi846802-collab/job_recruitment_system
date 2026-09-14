@@ -9,7 +9,7 @@ import 'providers/interview_provider.dart';
 import 'providers/candidate_profile_provider.dart';
 import 'providers/admin_provider.dart';
 import 'providers/theme_provider.dart';
-import 'screens/common/splash_screen.dart';
+import 'screens/common/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +40,7 @@ class JRMSApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            home: const SplashScreen(),
+            home: const LoginScreen(),
           );
         },
       ),
