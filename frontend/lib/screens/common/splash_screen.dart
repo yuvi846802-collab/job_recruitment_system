@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
-import '../candidate/candidate_main_layout.dart';
-import '../recruiter/recruiter_main_layout.dart';
-import '../admin/admin_main_layout.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -29,26 +26,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    if (authProvider.isAuthenticated) {
-      final role = authProvider.userRole.toLowerCase();
-      if (role == 'admin') {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AdminMainLayout()),
-        );
-      } else if (role == 'recruiter' || role == 'hr') {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const RecruiterMainLayout()),
-        );
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const CandidateMainLayout()),
-        );
-      }
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    }
+    // Always transition to LoginScreen as required by user flow
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
   }
 
   @override
