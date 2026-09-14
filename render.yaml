@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: jrms-backend-api
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: super_secret_jrms_jwt_key_2026_bca_project
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DATABASE_URL
+        value: postgresql://postgres.cqfcmrzayvtctbqlqzlo:Manpreet%4011@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+      - key: DIRECT_URL
+        value: postgresql://postgres.cqfcmrzayvtctbqlqzlo:Manpreet%4011@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
+      - key: CLIENT_ORIGIN
+        value: "*"
