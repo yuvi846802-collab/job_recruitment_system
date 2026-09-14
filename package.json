@@ -1,0 +1,10 @@
+{
+  "name": "jrms-monorepo",
+  "version": "1.0.0",
+  "description": "Job Recruitment Management System - Root Deployment Entry",
+  "main": "server.js",
+  "scripts": {
+    "postinstall": "cd backend && npm install",
+    "start": "node server.js"
+  }
+}
