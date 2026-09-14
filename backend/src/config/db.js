@@ -26,13 +26,20 @@ const dbConfig = {
 };
 
 async function initDB() {
-  // 1. Try PostgreSQL (Supabase) if URL is configured with real password
+  // 1. Try PostgreSQL (Supabase) if URL is configured
   if (isPgConfigured) {
     try {
       console.log('⚡ Initializing PostgreSQL (Supabase) connection...');
       pgPool = new Pool({
         connectionString: pgUrl,
-        ssl: { rejectUnauthorized: false }
+        ssl: { rejectUnauthorized: false },
+        connectionTimeoutMillis: 10000,
+        idleTimeoutMillis: 30000
+      });
+
+      // Prevent unhandled error crashes on idle pool client drops
+      pgPool.on('error', (err) => {
+        console.warn('⚠️ Idle PostgreSQL client warning:', err.message);
       });
 
       // Test connection
@@ -42,24 +49,28 @@ async function initDB() {
       console.log('✅ Connected to Supabase PostgreSQL Database successfully!');
 
       // Check if users table exists
-      const tableCheck = await pgPool.query(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';"
-      );
+      try {
+        const tableCheck = await pgPool.query(
+          "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';"
+        );
 
-      if (tableCheck.rows.length === 0) {
-        console.log('⚡ Empty Supabase DB detected. Executing pg_schema.sql & pg_seed.sql...');
-        const pgSchemaPath = path.join(__dirname, '../../database/pg_schema.sql');
-        const pgSeedPath = path.join(__dirname, '../../database/pg_seed.sql');
+        if (tableCheck.rows.length === 0) {
+          console.log('⚡ Empty Supabase DB detected. Executing pg_schema.sql & pg_seed.sql...');
+          const pgSchemaPath = path.join(__dirname, '../../database/pg_schema.sql');
+          const pgSeedPath = path.join(__dirname, '../../database/pg_seed.sql');
 
-        if (fs.existsSync(pgSchemaPath)) {
-          const schemaSql = fs.readFileSync(pgSchemaPath, 'utf8');
-          await pgPool.query(schemaSql);
+          if (fs.existsSync(pgSchemaPath)) {
+            const schemaSql = fs.readFileSync(pgSchemaPath, 'utf8');
+            await pgPool.query(schemaSql);
+          }
+          if (fs.existsSync(pgSeedPath)) {
+            const seedSql = fs.readFileSync(pgSeedPath, 'utf8');
+            await pgPool.query(seedSql);
+          }
+          console.log('✅ Supabase PostgreSQL Schema & Seed data initialized!');
         }
-        if (fs.existsSync(pgSeedPath)) {
-          const seedSql = fs.readFileSync(pgSeedPath, 'utf8');
-          await pgPool.query(seedSql);
-        }
-        console.log('✅ Supabase PostgreSQL Schema & Seed data initialized!');
+      } catch (seedErr) {
+        console.warn(`⚠️ Supabase Table Check / Seed Notice: ${seedErr.message}`);
       }
       return;
     } catch (pgErr) {
@@ -82,6 +93,9 @@ async function initDB() {
     await rootConn.end();
 
     mysqlPool = mysql.createPool(dbConfig);
+    mysqlPool.on('error', (err) => {
+      console.warn('⚠️ MySQL Pool warning:', err.message);
+    });
     
     const [tables] = await mysqlPool.query(`SHOW TABLES FROM \`${dbConfig.database}\`;`);
     if (tables.length === 0) {
@@ -99,16 +113,13 @@ async function initDB() {
     dbType = 'mysql';
     isConnected = true;
   } catch (mysqlErr) {
-    console.warn(`⚠️ MySQL Database Warning: ${mysqlErr.message}`);
-    if (pgUrl && pgUrl.includes('[YOUR-PASSWORD]')) {
-      console.warn('📌 NOTE: Replace [YOUR-PASSWORD] in backend/.env with your Supabase database password to connect to Supabase PostgreSQL.');
-    }
+    console.warn(`⚠️ MySQL Database Notice: ${mysqlErr.message}`);
     console.warn(`ℹ️ Operating in resilient backend mode.`);
     try {
       mysqlPool = mysql.createPool(dbConfig);
       dbType = 'mysql';
     } catch (e) {
-      console.error('Failed to create fallback pool:', e.message);
+      console.warn('Failed to create fallback pool:', e.message);
     }
   }
 }
@@ -127,24 +138,32 @@ function convertToPgSql(sql) {
 
 // Unified query abstraction layer
 async function query(sql, params = []) {
-  if (dbType === 'pg' && pgPool) {
-    const formattedSql = convertToPgSql(sql);
-    const result = await pgPool.query(formattedSql, params);
-    
-    const rows = result.rows || [];
-    rows.affectedRows = result.rowCount || 0;
-    rows.insertId = (rows[0] && rows[0].id) ? rows[0].id : null;
-    return rows;
-  } else if (mysqlPool) {
-    const [rows] = await mysqlPool.execute(sql, params);
-    return rows;
-  } else {
-    throw new Error('Database connection is not initialized. Please verify credentials in backend/.env');
+  try {
+    if (dbType === 'pg' && pgPool) {
+      const formattedSql = convertToPgSql(sql);
+      const result = await pgPool.query(formattedSql, params);
+      
+      const rows = result.rows || [];
+      rows.affectedRows = result.rowCount || 0;
+      rows.insertId = (rows[0] && rows[0].id) ? rows[0].id : null;
+      return rows;
+    } else if (mysqlPool) {
+      const [rows] = await mysqlPool.execute(sql, params);
+      return rows;
+    } else {
+      console.warn('Database query executed without active DB connection pool.');
+      return [];
+    }
+  } catch (err) {
+    console.error('Database Query Error:', err.message);
+    throw err;
   }
 }
 
-// Initialize on module load
-initDB();
+// Safe async initialization
+initDB().catch(err => {
+  console.warn('⚠️ DB Initialization background warning:', err.message);
+});
 
 module.exports = {
   getPool: () => (dbType === 'pg' ? pgPool : mysqlPool),
@@ -153,4 +172,3 @@ module.exports = {
   getDbType: () => dbType,
   initDB
 };
-
