@@ -1,7 +1,8 @@
+const path = require('path');
+const fs = require('fs');
 const mysql = require('mysql2/promise');
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 require('dotenv').config();
 
 let dbType = 'none'; // 'pg' | 'mysql' | 'mock'
